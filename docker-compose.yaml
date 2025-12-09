@@ -1,0 +1,50 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: kotonilo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kotonilo
+      POSTGRES_PASSWORD: kotonilo_secret
+      POSTGRES_DB: kotonilo_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./internal/adapters/postgresql/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U kotonilo -d kotonilo_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kotonilo-network
+
+  # Go API Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kotonilo-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DB_DSN: "postgres://kotonilo:kotonilo_secret@postgres:5432/kotonilo_db?sslmode=disable"
+      SERVER_ADDR: ":8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - kotonilo-network
+    command: [ "./main" ]
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  kotonilo-network:
+    driver: bridge

@@ -84,3 +84,6 @@ coverage.html
 # Debug files
 debug
 __debug_bin
+
+# Notes and Documentation
+.notes
