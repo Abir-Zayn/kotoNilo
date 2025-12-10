@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	repo "github.com/Abir-Zayn/kotoNilo/internal/adapters/postgresql/sqlc"
 	"github.com/Abir-Zayn/kotoNilo/internal/products"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // mount
@@ -28,9 +30,11 @@ func (app *application) mount() http.Handler {
 	})
 
 	// Products
-	productsService := products.NewService()
+	q := repo.New(app.db)
+	productsService := products.NewService(q)
 	productsHandler := products.NewHandler(productsService)
 	r.Get("/products", productsHandler.ListProducts)
+	r.Post("/products", productsHandler.CreateProduct)
 	return r
 }
 
@@ -50,8 +54,7 @@ func (app *application) run(h http.Handler) error {
 type application struct {
 	config config
 	// logger
-	// db driver
-
+	db *pgxpool.Pool
 }
 
 type config struct {

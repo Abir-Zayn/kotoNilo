@@ -3,6 +3,7 @@
 ## Quick Start with Docker
 
 ### Prerequisites
+
 - Docker
 - Docker Compose
 
@@ -11,26 +12,30 @@
 1. **Clone the repository** (if not already done)
 
 2. **Start all services**:
+
    ```bash
    docker-compose up -d
    ```
 
 3. **Check service status**:
+
    ```bash
    docker-compose ps
    ```
 
 4. **View logs**:
+
    ```bash
    # All services
    docker-compose logs -f
-   
+
    # Specific service
    docker-compose logs -f api
    docker-compose logs -f postgres
    ```
 
 5. **Stop services**:
+
    ```bash
    docker-compose down
    ```
@@ -49,6 +54,7 @@
 ### Database Access
 
 Connect to PostgreSQL using these credentials:
+
 - **Host**: localhost
 - **Port**: 5432
 - **Database**: kotonilo_db
@@ -56,6 +62,7 @@ Connect to PostgreSQL using these credentials:
 - **Password**: kotonilo_secret
 
 Using `psql`:
+
 ```bash
 docker-compose exec postgres psql -U kotonilo -d kotonilo_db
 ```
@@ -75,11 +82,13 @@ The application uses the following environment variables (see `.env.example`):
 ### Development
 
 #### Rebuild the application after code changes:
+
 ```bash
 docker-compose up -d --build api
 ```
 
 #### Run database migrations manually:
+
 ```bash
 # Access the postgres container
 docker-compose exec postgres bash
@@ -91,10 +100,12 @@ goose -dir /docker-entrypoint-initdb.d postgres "postgres://kotonilo:kotonilo_se
 ### Troubleshooting
 
 1. **Port already in use**:
+
    - Change the port mapping in `docker-compose.yaml`
    - Example: Change `"8080:8080"` to `"8081:8080"`
 
 2. **Database connection failed**:
+
    - Check if PostgreSQL is healthy: `docker-compose ps`
    - View logs: `docker-compose logs postgres`
    - Ensure the API waits for the database health check
@@ -128,6 +139,7 @@ goose -dir /docker-entrypoint-initdb.d postgres "postgres://kotonilo:kotonilo_se
 ## Local Development (without Docker)
 
 ### Prerequisites
+
 - Go 1.23+
 - PostgreSQL 16+
 - SQLC
@@ -135,21 +147,25 @@ goose -dir /docker-entrypoint-initdb.d postgres "postgres://kotonilo:kotonilo_se
 ### Setup
 
 1. **Install dependencies**:
+
    ```bash
    go mod download
    ```
 
 2. **Set up PostgreSQL database**:
+
    ```bash
    createdb kotonilo_db
    ```
 
 3. **Run migrations**:
+
    ```bash
    goose -dir ./internal/adapters/postgresql/migrations postgres "postgres://kotonilo:kotonilo_secret@localhost:5432/kotonilo_db?sslmode=disable" up
    ```
 
 4. **Generate SQLC code**:
+
    ```bash
    sqlc generate
    ```
@@ -164,13 +180,12 @@ goose -dir /docker-entrypoint-initdb.d postgres "postgres://kotonilo:kotonilo_se
 ### Endpoints
 
 #### Health Check
+
 - **GET** `/health`
 - **Response**: `doing good.`
 
 #### List Products
-- **GET** `/products`
+
+- **GET** `/products` [List of all products]
+- **POST** `/products` [Adding products]
 - **Response**: JSON array of products
-
-## License
-
-[Your License Here]

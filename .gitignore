@@ -17,6 +17,9 @@ vendor/
 # Go workspace file
 go.work
 
+# notes and docs
+.docs/
+
 # Build output
 bin/
 dist/
